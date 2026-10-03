@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Backup rules for CardMaxxxer.
+  This app stores sensitive financial data locally with SQLCipher encryption.
+  All backup content is excluded to protect user privacy.
+-->
+<full-backup-content>
+    <!-- Exclude all shared preferences -->
+    <exclude domain="sharedpref" path="." />
+
+    <!-- Exclude all databases -->
+    <exclude domain="database" path="." />
+
+    <!-- Exclude all files in internal storage -->
+    <exclude domain="file" path="." />
+
+    <!-- Exclude all cache -->
+    <exclude domain="cache" path="." />
+
+    <!-- Exclude all external storage -->
+    <exclude domain="external" path="." />
+
+    <!-- Exclude root domain -->
+    <exclude domain="root" path="." />
+</full-backup-content>

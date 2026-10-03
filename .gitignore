@@ -1,0 +1,85 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Local configuration
+local.properties
+secrets.gradle
+secrets.gradle.kts
+
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+.navigation/
+captures/
+output.json
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Build outputs
+*.apk
+*.aar
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Native libs
+*.so
+*.jni
+obj/
+
+# Logs
+*.log
+logcat.txt
+
+# Keystore files
+*.jks
+*.keystore
+keystore.properties
+
+# Google Services
+google-services.json
+
+# Version control
+vcs.xml
+
+# Lint
+lint/intermediates/
+lint/generated/
+lint/outputs/
+lint/tmp/
+
+# Android Profiling
+*.hprof
+
+# Kotlin
+.kotlin/
+
+# Test reports
+test-results/
+reports/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# CardMaxxxer specific
+/app/src/main/assets/encrypted_export/
+/app/src/main/assets/backup/
+*.enc
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
