@@ -3,10 +3,8 @@ package com.cardmaxxxer.ui.wallet
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
+
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.layout.Box
@@ -25,8 +23,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -56,7 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.pointerInput
+
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -441,110 +440,105 @@ private fun WalletCardItem(
     val usedValue = benefits.sumOf { it.valueCents ?: 0 } - walletCard.unusedValueCents
     val totalValue = benefits.sumOf { it.valueCents ?: 0 }
     val progress = if (totalValue > 0) usedValue.toFloat() / totalValue.toFloat() else 0f
-    var dragOffset by remember { mutableFloatStateOf(0f) }
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Card(
-            modifier = Modifier
-                .weight(1f)
-                .clickable(onClick = onClick),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                CardArt(
-                    card = card,
-                    modifier = Modifier.size(width = 80.dp, height = 50.dp),
+            CardArt(
+                card = card,
+                modifier = Modifier.size(width = 80.dp, height = 50.dp),
+            )
+            Spacer(Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = card.nickname ?: card.productName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
                 )
-                Spacer(Modifier.width(16.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = card.nickname ?: card.productName,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        text = "${card.issuer} •••• ${card.lastFour ?: "----"}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    card.foreignTransactionFeePercent?.let { fee ->
-                        if (fee > 0) {
-                            Text(
-                                text = "Foreign transaction fee: ${fee}%",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.error,
-                            )
-                        } else {
-                            Text(
-                                text = "No foreign transaction fees",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    }
-                    Text(
-                        text = if (card.annualFeeCents > 0) "Annual fee: ${formatDollars(card.annualFeeCents)}" else "No annual fee",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (card.annualFeeCents > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    LinearProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
+                Text(
+                    text = "${card.issuer} •••• ${card.lastFour ?: "----"}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                card.foreignTransactionFeePercent?.let { fee ->
+                    if (fee > 0) {
                         Text(
-                            text = "${benefits.size} benefits",
+                            text = "Foreign transaction fee: ${fee}%",
                             style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error,
                         )
+                    } else {
                         Text(
-                            text = "${formatDollars(walletCard.unusedValueCents)} unused",
+                            text = "No foreign transaction fees",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
+                Text(
+                    text = if (card.annualFeeCents > 0) "Annual fee: ${formatDollars(card.annualFeeCents)}" else "No annual fee",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (card.annualFeeCents > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                )
+                Spacer(Modifier.height(8.dp))
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = "${benefits.size} benefits",
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                    Text(
+                        text = "${formatDollars(walletCard.unusedValueCents)} unused",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
             }
-        }
-        // Drag handle - separate from clickable Card
-        val draggableState = rememberDraggableState { delta ->
-            dragOffset += delta
-            if (dragOffset < -20 && !isFirst) {
-                onMoveUp()
-                dragOffset = 0f
-            } else if (dragOffset > 20 && !isLast) {
-                onMoveDown()
-                dragOffset = 0f
+            // Reorder buttons - always visible, no drag needed
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                IconButton(
+                    onClick = onMoveUp,
+                    enabled = !isFirst,
+                    modifier = Modifier.size(36.dp),
+                ) {
+                    Icon(
+                        Icons.Default.KeyboardArrowUp,
+                        contentDescription = "Move up",
+                        tint = if (isFirst) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                        else MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp),
+                    )
+                }
+                IconButton(
+                    onClick = onMoveDown,
+                    enabled = !isLast,
+                    modifier = Modifier.size(36.dp),
+                ) {
+                    Icon(
+                        Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Move down",
+                        tint = if (isLast) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                        else MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp),
+                    )
+                }
             }
-        }
-        Box(
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .size(56.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .draggable(
-                    state = draggableState,
-                    orientation = Orientation.Vertical,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                Icons.Default.DragHandle,
-                contentDescription = "Drag to reorder",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(28.dp),
-            )
         }
     }
 }
