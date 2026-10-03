@@ -12,6 +12,7 @@ import com.cardmaxxxer.domain.model.CreditCard
 import com.cardmaxxxer.domain.model.UserCardCrossReference
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,10 +30,10 @@ class SeedDataLoader @Inject constructor(
 ) {
 
     suspend fun seedIfNeeded() = withContext(Dispatchers.IO) {
-        val prefs = context.getSharedPreferences("cardmaxxxer_prefs", Context.MODE_PRIVATE)
-        val hasSeeded = prefs.getBoolean("has_seeded_cards", false)
-
-        if (!hasSeeded) {
+        // Check if database is actually empty (not just a flag, since schema
+        // migrations with fallbackToDestructiveMigration wipe the data)
+        val existingCards = creditCardDao.observeAllActive().first()
+        if (existingCards.isEmpty()) {
             val now = System.currentTimeMillis()
             val seedCards = SeedData.toCreditCards()
 
@@ -61,7 +62,6 @@ class SeedDataLoader @Inject constructor(
                 }
             }
 
-            prefs.edit().putBoolean("has_seeded_cards", true).apply()
         }
     }
 }

@@ -4,8 +4,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -514,35 +517,31 @@ private fun WalletCardItem(
             }
         }
         // Drag handle - separate from clickable Card
+        val draggableState = rememberDraggableState { delta ->
+            dragOffset += delta
+            if (dragOffset < -20 && !isFirst) {
+                onMoveUp()
+                dragOffset = 0f
+            } else if (dragOffset > 20 && !isLast) {
+                onMoveDown()
+                dragOffset = 0f
+            }
+        }
         Box(
             modifier = Modifier
                 .padding(start = 8.dp)
                 .size(56.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
-                .pointerInput(isFirst, isLast) {
-                    detectDragGesturesAfterLongPress(
-                        onDragStart = { },
-                        onDragEnd = { },
-                        onDragCancel = { },
-                        onDrag = { change, dragAmount ->
-                            change.consume()
-                            dragOffset += dragAmount.y
-                            if (dragOffset < -20 && !isFirst) {
-                                onMoveUp()
-                                dragOffset = 0f
-                            } else if (dragOffset > 20 && !isLast) {
-                                onMoveDown()
-                                dragOffset = 0f
-                            }
-                        },
-                    )
-                },
+                .draggable(
+                    state = draggableState,
+                    orientation = Orientation.Vertical,
+                ),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 Icons.Default.DragHandle,
-                contentDescription = "Long press and drag to reorder",
+                contentDescription = "Drag to reorder",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(28.dp),
             )

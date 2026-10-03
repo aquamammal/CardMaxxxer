@@ -17,7 +17,7 @@ data class ContextSelectorUiState(
     val selectedContext: SpendingContext? = null,
     val recommendations: List<CardRecommendation> = emptyList(),
     val isLoading: Boolean = false,
-    val sortByPoints: Boolean = false,
+    val sortByPoints: Boolean = true,
 )
 
 @HiltViewModel
@@ -36,8 +36,13 @@ class ContextSelectorViewModel @Inject constructor(
                 context = context,
                 todayEpochDay = today,
             )
+            // Sort by points by default
+            val sorted = recs.sortedByDescending { rec ->
+                val maxRate = rec.matchedBenefits.mapNotNull { it.rewardRatePercent }.maxOrNull() ?: 0.0
+                if (maxRate >= 2.0) maxRate * 1.5 else maxRate
+            }
             _uiState.value = _uiState.value.copy(
-                recommendations = recs,
+                recommendations = sorted,
                 isLoading = false,
             )
         }
