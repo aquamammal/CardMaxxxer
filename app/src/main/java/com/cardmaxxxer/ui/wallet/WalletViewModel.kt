@@ -2,6 +2,7 @@ package com.cardmaxxxer.ui.wallet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cardmaxxxer.core.database.dao.CreditCardDao
 import com.cardmaxxxer.domain.model.WalletCard
 import com.cardmaxxxer.domain.repository.RecommendationRepository
 import com.cardmaxxxer.domain.repository.UserCardCrossReferenceRepository
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -25,6 +27,7 @@ data class WalletFilter(
 @HiltViewModel
 class WalletViewModel @Inject constructor(
     recommendationRepository: RecommendationRepository,
+    private val creditCardDao: CreditCardDao,
     private val userCardCrossReferenceRepository: UserCardCrossReferenceRepository,
 ) : ViewModel() {
 
@@ -62,20 +65,25 @@ class WalletViewModel @Inject constructor(
 
     fun moveCard(cardId: String, direction: Int) {
         viewModelScope.launch {
-            val cards = walletCards.value.toMutableList()
-            val index = cards.indexOfFirst { it.card.id == cardId }
+            // Query the database directly for the current order (not stale StateFlow)
+            val allCards = creditCardDao.observeAllActive().first()
+            val crossRefs = userCardCrossReferenceRepository.observeByUser("default_user").first()
+            val sorted = allCards.sortedBy { card ->
+                crossRefs.firstOrNull { it.cardId == card.id }?.priorityRank ?: Int.MAX_VALUE
+            }
+            val index = sorted.indexOfFirst { it.id == cardId }
             if (index < 0) return@launch
             val newIndex = index + direction
-            if (newIndex < 0 || newIndex >= cards.size) return@launch
-            val removed = cards.removeAt(index)
-            cards.add(newIndex, removed)
-            // Update priority ranks
-            cards.forEachIndexed { i, walletCard ->
-                val crossRef = walletCard.crossReference ?: return@forEachIndexed
-                userCardCrossReferenceRepository.update(
-                    crossRef.copy(priorityRank = i)
-                )
-            }
+            if (newIndex < 0 || newIndex >= sorted.size) return@launch
+            // Swap priority ranks
+            val currentCrossRef = crossRefs.firstOrNull { it.cardId == cardId } ?: return@launch
+            val targetCrossRef = crossRefs.firstOrNull { it.cardId == sorted[newIndex].id } ?: return@launch
+            userCardCrossReferenceRepository.update(
+                currentCrossRef.copy(priorityRank = targetCrossRef.priorityRank)
+            )
+            userCardCrossReferenceRepository.update(
+                targetCrossRef.copy(priorityRank = currentCrossRef.priorityRank)
+            )
         }
     }
 }

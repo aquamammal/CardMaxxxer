@@ -35,6 +35,7 @@ class EditCardViewModel @Inject constructor(
         lastFour: String?,
         nickname: String?,
         annualFeeCents: Long,
+        balanceCents: Long,
         foreignTransactionFeePercent: Double?,
     ) {
         viewModelScope.launch {
@@ -46,6 +47,7 @@ class EditCardViewModel @Inject constructor(
                 lastFour = lastFour,
                 nickname = nickname,
                 annualFeeCents = annualFeeCents,
+                balanceCents = balanceCents,
                 foreignTransactionFeePercent = foreignTransactionFeePercent,
                 updatedAt = System.currentTimeMillis(),
             )

@@ -83,6 +83,7 @@ fun EditCardScreen(
     var nickname by remember { mutableStateOf(c.nickname ?: "") }
     var annualFee by remember { mutableStateOf(if (c.annualFeeCents > 0) c.annualFeeCents.toString() else "") }
     var foreignTransactionFee by remember { mutableStateOf(c.foreignTransactionFeePercent?.toString() ?: "") }
+    var balance by remember { mutableStateOf(if (c.balanceCents > 0) c.balanceCents.toString() else "") }
     var catalogDropdownExpanded by remember { mutableStateOf(false) }
     var selectedCatalogCard by remember { mutableStateOf<CardCatalog.CardSpec?>(null) }
 
@@ -253,6 +254,20 @@ fun EditCardScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             )
 
+            OutlinedTextField(
+                value = balance,
+                onValueChange = { newValue ->
+                    if (newValue.all { it.isDigit() }) {
+                        balance = newValue
+                    }
+                },
+                label = { Text("Balance in cents (optional)") },
+                placeholder = { Text("e.g. 15000 for $150") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            )
+
             Spacer(Modifier.height(8.dp))
 
             Button(
@@ -265,6 +280,7 @@ fun EditCardScreen(
                         lastFour = lastFour.trim().ifBlank { null },
                         nickname = nickname.trim().ifBlank { null },
                         annualFeeCents = annualFee.trim().toLongOrNull() ?: 0L,
+                        balanceCents = balance.trim().toLongOrNull() ?: 0L,
                         foreignTransactionFeePercent = foreignTransactionFee.trim().toDoubleOrNull(),
                     )
                     onBack()

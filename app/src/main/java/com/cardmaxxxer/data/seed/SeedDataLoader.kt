@@ -75,6 +75,7 @@ private fun CreditCard.toEntity() = CreditCardEntity(
     nickname = nickname,
     cardArtColor = cardArtColor,
     annualFeeCents = annualFeeCents,
+    balanceCents = balanceCents,
     foreignTransactionFeePercent = foreignTransactionFeePercent,
     isActive = isActive,
     openedAtEpochDay = openedAtEpochDay,

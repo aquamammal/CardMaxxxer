@@ -25,6 +25,7 @@ class AddCardViewModel @Inject constructor(
         lastFour: String?,
         nickname: String?,
         annualFeeCents: Long,
+        balanceCents: Long = 0L,
         foreignTransactionFeePercent: Double? = null,
     ) {
         viewModelScope.launch {
@@ -40,6 +41,7 @@ class AddCardViewModel @Inject constructor(
                 nickname = nickname,
                 cardArtColor = defaultColorForIssuer(issuer),
                 annualFeeCents = annualFeeCents,
+                balanceCents = balanceCents,
                 foreignTransactionFeePercent = foreignTransactionFeePercent,
                 isActive = true,
                 openedAtEpochDay = null,

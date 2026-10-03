@@ -25,6 +25,7 @@ data class CreditCard(
     val nickname: String? = null,
     val cardArtColor: Long = 0xFF1A73E8,
     val annualFeeCents: Long = 0L,
+    val balanceCents: Long = 0L,
     val foreignTransactionFeePercent: Double? = null,
     val isActive: Boolean = true,
     val openedAtEpochDay: Long? = null,

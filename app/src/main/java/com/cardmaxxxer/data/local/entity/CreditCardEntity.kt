@@ -13,6 +13,7 @@ data class CreditCardEntity(
     val nickname: String?,
     val cardArtColor: Long,
     val annualFeeCents: Long,
+    val balanceCents: Long,
     val foreignTransactionFeePercent: Double?,
     val isActive: Boolean,
     val openedAtEpochDay: Long?,

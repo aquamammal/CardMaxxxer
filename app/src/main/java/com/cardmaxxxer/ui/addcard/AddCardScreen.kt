@@ -52,6 +52,7 @@ fun AddCardScreen(
     var nickname by remember { mutableStateOf("") }
     var annualFee by remember { mutableStateOf("") }
     var foreignTransactionFee by remember { mutableStateOf("") }
+    var balance by remember { mutableStateOf("") }
     var catalogDropdownExpanded by remember { mutableStateOf(false) }
     var selectedCatalogCard by remember { mutableStateOf<CardCatalog.CardSpec?>(null) }
 
@@ -226,6 +227,20 @@ fun AddCardScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             )
 
+            OutlinedTextField(
+                value = balance,
+                onValueChange = { newValue ->
+                    if (newValue.all { it.isDigit() }) {
+                        balance = newValue
+                    }
+                },
+                label = { Text("Balance in cents (optional)") },
+                placeholder = { Text("e.g. 15000 for $150") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            )
+
             Spacer(Modifier.height(8.dp))
 
             Button(
@@ -237,6 +252,7 @@ fun AddCardScreen(
                         lastFour = lastFour.trim().ifBlank { null },
                         nickname = nickname.trim().ifBlank { null },
                         annualFeeCents = annualFee.trim().toLongOrNull() ?: 0L,
+                        balanceCents = balance.trim().toLongOrNull() ?: 0L,
                         foreignTransactionFeePercent = foreignTransactionFee.trim().toDoubleOrNull(),
                     )
                     onBack()

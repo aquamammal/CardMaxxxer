@@ -486,6 +486,13 @@ private fun WalletCardItem(
                     style = MaterialTheme.typography.labelSmall,
                     color = if (card.annualFeeCents > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                 )
+                if (card.balanceCents > 0) {
+                    Text(
+                        text = "Balance: ${formatDollars(card.balanceCents)}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
                 Spacer(Modifier.height(8.dp))
                 LinearProgressIndicator(
                     progress = { progress },
